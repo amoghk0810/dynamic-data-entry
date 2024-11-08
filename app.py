@@ -99,8 +99,8 @@ st.download_button(
 
 # Function to send email with attachment
 def send_email_with_attachment(receiver_email, file_path):
-    sender_email = "your_email@example.com"  # Replace with your email
-    sender_password = "your_password"        # Replace with your email password
+    sender_email = "amogh.kawle@multiline.tech"  # Replace with your email
+    sender_password = "sled wvrx zsmq wlqj"        # Replace with your email password
     subject = "Order Data CSV File"
     body = "Please find the attached order data CSV file."
 
@@ -129,7 +129,7 @@ if st.button("Save to Output Folder and Send Email"):
     st.success(f"File saved to {output_path}")
 
     # Send email with attachment
-    receiver_email = "recipient@example.com"  # Replace with the recipient's email address
+    receiver_email = "amogh.kawle@multiline.tech"  # Replace with the recipient's email address
     try:
         send_email_with_attachment(receiver_email, output_path)
         st.success(f"Email sent to {receiver_email} with the CSV attachment.")
