@@ -2,14 +2,19 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 import os
+from pathlib import Path
 import smtplib
 from email.message import EmailMessage
-from email.mime.base import MIMEBase
-from email import encoders
+
+# Define the folder where CSV files will be saved
+OUTPUT_FOLDER = Path("output_files")
+OUTPUT_FOLDER.mkdir(exist_ok=True)  # Create folder if it doesn't exist
+
+st.title("Dynamic Order Entry System")
 
 # Load data and initialize options
 try:
-    options_df = pd.read_csv('products - Sheet1.csv')
+    options_df = pd.read_csv('/home/openbravo/email_order/csvs/products - Sheet1.csv')
     business_partner_options = options_df['A'].dropna().unique().tolist()
     product_map = dict(zip(options_df['C'].dropna(), options_df['B'].dropna()))
     product_options = list(product_map.keys())
@@ -18,7 +23,7 @@ except FileNotFoundError:
     business_partner_options = []
     product_options = []
 except UnicodeDecodeError:
-    st.error("There was an error decoding the CSV file. Try saving the file with UTF-8 encoding or use a different encoding format.")
+    st.error("Error decoding the CSV file. Try saving with UTF-8 encoding.")
     business_partner_options = []
     product_options = []
 
@@ -34,16 +39,13 @@ if "df" not in st.session_state:
     ]
     st.session_state["df"] = pd.DataFrame(columns=columns)
 
-# Streamlit app layout
-st.title("Dynamic Order Entry System")
-
 # Dropdown for selecting Business Partner
 business_partner = st.selectbox("Business Partner*", business_partner_options)
 
-# Single date input
+# Date input
 order_date = st.date_input("Order Rec Date & Time*", datetime.today())
 
-# Initialize session state for products
+# Initialize session state for products if not already initialized
 if "products" not in st.session_state:
     st.session_state["products"] = []
 
@@ -51,7 +53,7 @@ if "products" not in st.session_state:
 def add_product():
     st.session_state.products.append({"Description": "", "Sales Order Qty": 1, "Product Code": ""})
 
-# Button to add new product entry
+# Button to add a new product entry
 st.button("Add Product", on_click=add_product)
 
 # Display product entries dynamically
@@ -95,46 +97,41 @@ st.download_button(
     mime="text/csv"
 )
 
-# Define output folder for server storage
-output_folder = os.getenv("OUTPUT_DIR", "/path/to/server/directory")  # Replace with actual path or environment variable
-os.makedirs(output_folder, exist_ok=True)  # Ensure output folder exists
-
-# Function to save file with a timestamp and send email with attachment
-def save_and_send_email(receiver_email):
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"order_data_{timestamp}.csv"
-    output_path = os.path.join(output_folder, filename)
-    st.session_state["df"].to_csv(output_path, index=False)
-    st.success(f"File saved to {output_path}")
-
-    # Email setup
+# Function to send email with attachment
+def send_email_with_attachment(receiver_email, file_path):
     sender_email = "your_email@example.com"  # Replace with your email
     sender_password = "your_password"        # Replace with your email password
     subject = "Order Data CSV File"
     body = "Please find the attached order data CSV file."
 
-    # Set up email
+    # Set up the email
     msg = EmailMessage()
     msg['From'] = sender_email
     msg['To'] = receiver_email
     msg['Subject'] = subject
     msg.set_content(body)
 
-    # Attach the CSV file
-    with open(output_path, "rb") as f:
+    # Attach the file
+    with open(file_path, "rb") as f:
         file_data = f.read()
-        msg.add_attachment(file_data, maintype="application", subtype="octet-stream", filename=filename)
+        file_name = os.path.basename(file_path)
+        msg.add_attachment(file_data, maintype="application", subtype="octet-stream", filename=file_name)
 
     # Send the email
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        server.login(sender_email, sender_password)
+        server.send_message(msg)
+
+# Save file and email on button click
+if st.button("Save to Output Folder and Send Email"):
+    output_path = OUTPUT_FOLDER / "order_data.csv"  # Define the path to save the CSV
+    st.session_state["df"].to_csv(output_path, index=False)
+    st.success(f"File saved to {output_path}")
+
+    # Send email with attachment
+    receiver_email = "recipient@example.com"  # Replace with the recipient's email address
     try:
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:  # Use appropriate SMTP settings
-            server.login(sender_email, sender_password)
-            server.send_message(msg)
+        send_email_with_attachment(receiver_email, output_path)
         st.success(f"Email sent to {receiver_email} with the CSV attachment.")
     except Exception as e:
         st.error(f"Failed to send email: {e}")
-
-# Button to save file and send email
-if st.button("Save to Output Folder and Send Email"):
-    receiver_email = "recipient@example.com"  # Replace with recipient's email address
-    save_and_send_email(receiver_email)
