@@ -14,7 +14,7 @@ st.title("Dynamic Order Entry System")
 
 # Load data and initialize options
 try:
-    options_df = pd.read_csv('/home/openbravo/email_order/csvs/products - Sheet1.csv')
+    options_df = pd.read_csv('products - Sheet1.csv')
     business_partner_options = options_df['A'].dropna().unique().tolist()
     product_map = dict(zip(options_df['C'].dropna(), options_df['B'].dropna()))
     product_options = list(product_map.keys())
