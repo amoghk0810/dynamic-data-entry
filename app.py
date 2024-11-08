@@ -100,7 +100,7 @@ st.download_button(
 # Function to send email with attachment
 def send_email_with_attachment(receiver_email, file_path):
     sender_email = "amogh.kawle@multiline.tech"  # Replace with your email
-    sender_password = "sled wvrx zsmq wlqj"        # Replace with your email password
+    sender_password = "xxxx xxxx xxxx xxxx"        # Replace with your email password
     subject = "Order Data CSV File"
     body = "Please find the attached order data CSV file."
 
