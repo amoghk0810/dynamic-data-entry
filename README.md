@@ -1,1 +1,1 @@
-# daynamic-data-entry
+# dynamic-data-entry
