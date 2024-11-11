@@ -98,40 +98,40 @@ st.download_button(
 )
 
 # Function to send email with attachment
-def send_email_with_attachment(receiver_email, file_path):
-    sender_email = "amogh.kawle@multiline.tech"  # Replace with your email
-    sender_password = "xxxx xxxx xxxx xxxx"        # Replace with your email password
-    subject = "Order Data CSV File"
-    body = "Please find the attached order data CSV file."
+# def send_email_with_attachment(receiver_email, file_path):
+#     sender_email = "amogh.kawle@multiline.tech"  # Replace with your email
+#     sender_password = "xxxx xxxx xxxx xxxx"        # Replace with your email password
+#     subject = "Order Data CSV File"
+#     body = "Please find the attached order data CSV file."
 
-    # Set up the email
-    msg = EmailMessage()
-    msg['From'] = sender_email
-    msg['To'] = receiver_email
-    msg['Subject'] = subject
-    msg.set_content(body)
+#     # Set up the email
+#     msg = EmailMessage()
+#     msg['From'] = sender_email
+#     msg['To'] = receiver_email
+#     msg['Subject'] = subject
+#     msg.set_content(body)
 
-    # Attach the file
-    with open(file_path, "rb") as f:
-        file_data = f.read()
-        file_name = os.path.basename(file_path)
-        msg.add_attachment(file_data, maintype="application", subtype="octet-stream", filename=file_name)
+#     # Attach the file
+#     with open(file_path, "rb") as f:
+#         file_data = f.read()
+#         file_name = os.path.basename(file_path)
+#         msg.add_attachment(file_data, maintype="application", subtype="octet-stream", filename=file_name)
 
-    # Send the email
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-        server.login(sender_email, sender_password)
-        server.send_message(msg)
+#     # Send the email
+#     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+#         server.login(sender_email, sender_password)
+#         server.send_message(msg)
 
-# Save file and email on button click
-if st.button("Save to Output Folder and Send Email"):
-    output_path = OUTPUT_FOLDER / "order_data.csv"  # Define the path to save the CSV
-    st.session_state["df"].to_csv(output_path, index=False)
-    st.success(f"File saved to {output_path}")
+# # Save file and email on button click
+# if st.button("Save to Output Folder and Send Email"):
+#     output_path = OUTPUT_FOLDER / "order_data.csv"  # Define the path to save the CSV
+#     st.session_state["df"].to_csv(output_path, index=False)
+#     st.success(f"File saved to {output_path}")
 
-    # Send email with attachment
-    receiver_email = "amogh.kawle@multiline.tech"  # Replace with the recipient's email address
-    try:
-        send_email_with_attachment(receiver_email, output_path)
-        st.success(f"Email sent to {receiver_email} with the CSV attachment.")
-    except Exception as e:
-        st.error(f"Failed to send email: {e}")
+#     # Send email with attachment
+#     receiver_email = "amogh.kawle@multiline.tech"  # Replace with the recipient's email address
+#     try:
+#         send_email_with_attachment(receiver_email, output_path)
+#         st.success(f"Email sent to {receiver_email} with the CSV attachment.")
+#     except Exception as e:
+#         st.error(f"Failed to send email: {e}")
