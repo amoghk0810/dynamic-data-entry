@@ -4,7 +4,7 @@ from datetime import datetime
 import os
 from pathlib import Path
 import smtplib
-from email.message import EmailMessage
+#from email.message import EmailMessage
 
 # Define the folder where CSV files will be saved
 OUTPUT_FOLDER = Path("output_files")
